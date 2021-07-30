@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{%block title%}
+Delete Movement 
+{% endblock %}
+{%block content%}
+{% if user.is_authenticated %}
+	<h1>Delete Movement Detail</h1>
+	<br/><br/>
+	<h3>Delete:Movement{{object.PartyRef}}</h3>
+	<br/><br/>
+	<div class="form-group">
+	<form method="POST">
+		{% csrf_token %}
+		<strong>Are You Sure!</strong><br/>
+		<button class="btn btn-secondary">Delete</button>
+	</form>
+	</div>
+{% else %}
+	Please login and try again.....
+{% endif %}
+{% endblock %}

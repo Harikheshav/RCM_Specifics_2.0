@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{%block title%}
+{% endblock %}
+{% block content %}
+{% load group_find %}
+{% if user|is_group:"Officer" %}
+	<form method ="POST">
+		{% csrf_token %}
+		<h3>Start_Date:<input type="text"  name ="start_date">
+		End_Date:<input type="text" name ="end_date"></h3>
+		<button class="btn btn-secondary">Filter</button><br/>
+	</form>
+	<h1>VehicleNo:{{ veh_no }}</h1>
+	{% for obj in objs %}
+	{% if obj.ReasonId == 0 %}
+	    <h3>Amount:{{ obj.Amount }}</h3>
+		<h3>Reason:{{ obj.Reason }}</h3>
+		<h3>Date:{{ obj.Date }}</h3>
+	{% else %}
+	<a href="movement/{{obj.ReasonId}}">
+        <h3>Amount:{{ obj.Amount }}</h3>
+		<h3>Reason:{{ obj.Reason }}</h3>
+		<h3>Date:{{ obj.Date }}</h3>
+	</a>
+	{% endif %}
+	{% endfor %}
+	<h3>Total Income:{{total_inc}}</h3>
+	<h3>Total Expense:{{total_exp}}</h3>
+	<h3>Total:{{total}}</h3>
+	    <a href="{%url 'veh_list' %}" class="btn btn-outline-secondary">Back</a>
+{% else %}
+		Please ask your admin to add you in "Officer"
+
+{% endif %}
+{% endblock %}

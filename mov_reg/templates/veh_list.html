@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{%block title%}
+Vehicle List
+{% endblock %}
+{% load group_find %}
+{%block content%}
+{% if user|is_group:"Officer" %}
+	<h1>RCM Vehicle List</h1>
+	<ul>
+	{% for veh_no in veh_nos %}
+		<li><a href="{% url 'veh_details' veh_no %}">{{veh_no}}</a></li>
+	{% endfor %}
+	</ul>
+	<h3>Total Income:{{total_inc}}</h3>
+	<h3>Total Expense:{{total_exp}}</h3>
+	<h3>Total:{{total}}</h3>
+{% else %}
+	Please ask your admin to add you in "Officer"
+{% endif %}
+{% endblock %}

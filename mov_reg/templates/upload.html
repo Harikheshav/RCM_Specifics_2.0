@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{%block title%}
+{% endblock %}
+{% block content %}
+{% load group_find %}
+{% if user|is_group:"Officer" %}
+	<h1>The app requires some standard data for smooth working.
+	Follow the steps to do the same.
+	</h1>
+	<h2>
+	Step-1:
+	</h2>
+	<h3>Download the
+	{% load static %}	
+	<a href="{% static 'Template.xlsx' %}">template file</a></h3>
+	<br/>
+	<h2>
+	Step-2:
+	</h2>
+	<h3>Fill Up the Fields of the file properly.<h3>
+	<br/>
+	<h2>
+	Step-3:
+	</h2>
+	<h3>Upload the same file with name 'Template.xlsx' below.</h3>
+	<br/>
+	{%if request.session.file_state %}
+		<h3>File has been deleted.</h3>
+	{% endif %}	
+	{%if path_exists %}
+			<h3>The Sample File already exists press, <a href="{%url 'delete_file' %}">delete</a> to delete the file....</h3>
+	{% else %}
+	<h3>
+	<form method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		{{form}}
+		<button type="submit">Upload</button>
+	 </form>
+	 </h3>
+	{% endif %}
+{% else %}
+		Please ask your admin to add you in "Officer"
+{% endif %}
+{% endblock %}

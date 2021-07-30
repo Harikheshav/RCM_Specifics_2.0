@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{%block title%}
+Add Movement 
+{% endblock %}
+{% load group_find %}
+{%block content%}
+{% if user|is_group:"Crew" %}
+	<h1>Add Movement Detail</h1>
+	<br/><br/>
+	<h2>{{form_message}}</h2>
+	<div class="form-group">
+	<form method="POST">
+	{% csrf_token %}
+	{{ form }}<br><br>
+	<button class="btn btn-secondary">Add</button>&nbsp&nbsp&nbsp
+	</form>
+	<br/>
+	<a class="btn btn-secondary" href="{% url 'add_mov_empty' %}" name="clear">Clear</a>&nbsp&nbsp&nbsp
+	<a class="btn btn-secondary" href="{% url 'home' %}" name="home">Home</a>
+	</div>
+{% else %}
+	Please join in Crew and try again
+{% endif %}
+{% endblock %}

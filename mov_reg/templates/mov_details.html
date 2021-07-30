@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{%block title%}
+{% endblock %}
+{% block content %}
+{% if user.is_authenticated %}
+        <h3>Movement:{{object.PartyRef }}<br/><a href="{% url 'update_mov' object.pk %}">(Edit)</a>-<a href="{% url 'delete_mov' object.pk %}">(Delete)</a></li></h3>
+        <h3>Party:{{ object.Party }}</h3>
+        <h3>ACofParty:{{ object.ACofParty }}</h3>
+		<h3>Movement:{{ object.Movement }}</h3>
+		<h3>Size:{{ object.Size }}</h3>
+		<h3>ContainerNo:{{ object.ContainerNo }}</h3>
+		<h3>From:{{ object.From }}</h3>
+		<h3>To1:{{ object.To1 }}</h3>
+		<h3>To2:{{ object.To2 }}</h3>
+		<h3>VehicleNo:{{ object.VehicleNo }}</h3>
+		<h3>TransporterName:{{ object.TransporterName }}</h3>
+		<h3>InvoiceNo:{{ object.InvoiceNo }}</h3>
+		<h3>InvoiceDate:{{ object.InvoiceDate }}</h3>
+		<h3>InvoiceAmount;{{ object.InvoiceAmount }}</h3>
+		<h3>TripSheetNo:{{ object.TripSheetNo }}</h3>
+		<h3>TripSheetAmount:{{ object.TripSheetAmount }}</h3>
+		<h3>TripSheetDate:{{ object.TripSheetDate }}</h3>
+		<h3>CashAdvance:{{ object.CashAdvance }}</h3>
+		<h3>ChequeAdvance:{{ object.ChequeAdvance }}</h3>
+		<h3>Fixed_Advance:{{ object.Fixed_Advance }}</h3>
+		<h3>Diesel:{{ object.Diesel }}</h3>
+		<h3>Alloted_Diesel:{{ object.Alloted_Diesel }}</h3>
+	    <h3>Diesel_Advance:{{ object.Diesel_Advance }}</h3>
+		<h3>Fixed_Diesel_Advance:{{ object.Fixed_Diesel_Advance }}</h3>
+	    <h3>Status:{{ object.Status }}</h3>
+		<h3>Driver_Name:{{ object.Driver_Name }}</h3>		
+	    <a href="{%url 'home' %}" class="btn btn-outline-secondary">Back</a>
+{% else %}
+	Please login and try again.....
+{% endif %}
+{% endblock %}

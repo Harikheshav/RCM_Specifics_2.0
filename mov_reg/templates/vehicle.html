@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{%block title%}
+Add Movement 
+{% endblock %}
+{% load group_find %}
+{%block content%}
+{% if user|is_group:"Officer" %}
+	<h1>Vehicle Details Registration</h1>
+	<div class="form-group">
+	<form method="POST">
+	{% csrf_token %}
+	{{ form }}<br><br>
+	<button class="btn btn-secondary">Add</button>
+	</form>
+	<br/>
+	</div>
+{% else %}
+		Please ask your admin to add you in "Officer"
+{% endif %}
+{% endblock %}

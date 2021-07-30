@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{%block title%}
+Movement Register
+{% endblock %}
+{%block content%}
+{% load group_find %}
+{% if user|is_group:"Officer" %}
+In the below textbox the following input formats can be used:
+<ul>
+<li>For searching single value the value can be typed:-<br/>
+Example:20-12-2020</li>
+<li>For searching multiple values the values are seperated by comma(,):-<br/>
+Example:20-12-2020,15-01-2020</li>
+<li>For searching a range of dates the start and end dates are seperated by colon(:):-<br/>
+Example:20-12-2020:24-12-2020</li>
+<li>For searching multiple ranges of dates each range is seperated by a comma(,) and the range's start and end dates are 
+seperated by colon(:)  :-<br/>
+Example:20-12-2020:24-12-2020,15-01-2020:24-01-2020</li> <br/>
+<h3>{{message}}</h3>
+</ul>
+<div class="form-group">
+<form method ="POST">
+	{% csrf_token %}
+	<select  name="search_in" value="choice">
+	<option value="">-------</option>
+	{% for col in cols %}
+	<option value="{{col}}">{{col}}</option>
+	{% endfor %}
+	</select>
+	:<input type="text" name="search_for" value="{{search_for}}"></input>
+	:<input type="text" name="update" ></input>
+	<br/>
+	{% for col in cols %}
+	{{col}}:<input type="checkbox" name="display_col"  checked=True value={{col}}></input><br/>
+	{% endfor %}
+	<br/>
+<button class="btn btn-secondary" type ="submit">Display</button> &nbsp
+<button class="btn btn-secondary" type ="submit" name ="Update">Update</button> &nbsp
+<button class="btn btn-secondary" type ="submit" name="Export">Export</button> &nbsp
+<input type="text" name="date" placeholder="Date" value="{{today}}"></input> &nbsp
+<button class="btn btn-secondary" type ="submit" name="veh_stat">Vehicle Status</button> &nbsp
+</form>
+</div>
+{% else %}
+		Please ask your admin to add you in "Officer"
+{% endif %}
+{% endblock %}

@@ -1,0 +1,6 @@
+{% load group_find %}
+{% if user|is_group:"Officer" %}
+{{table | safe }}
+{% else %}
+		Please ask your admin to add you in "Officer"
+{% endif %}
