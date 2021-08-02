@@ -209,8 +209,8 @@ def FilterView(request):
             objs=Movement.objects.filter(**{val['search_in'][0]+'__in':ranges}).exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(*(val['display_col']+['id']))
         if 'Update' in request.POST:
              objs.update(**{val['search_in'][0]:val['update'][0].upper()})
-             message='Updated Successfully for checking press Display'
-             return render(request,'filter.html',{'cols':cols,'today':today,'message':message,'search_for':val['update'][0].upper(),'search_in':val['search_in'][0]})
+             message='Updated Successfully'
+             return render(request,'filter.html',{'cols':cols,'today':today,'message':message})
         elif 'Export' in request.POST:
             return ExcelResponse(objs)
         elif 'veh_stat' in request.POST:
