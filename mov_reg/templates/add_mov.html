@@ -4,7 +4,7 @@ Add Movement
 {% endblock %}
 {% load group_find %}
 {%block content%}
-{% if user|is_group:"Crew" %}
+{% if user|is_group:"Crew" or user|is_group:"Officer" %}
 	<h1>Add Movement Detail</h1>
 	<br/><br/>
 	<h2>{{form_message}}</h2>

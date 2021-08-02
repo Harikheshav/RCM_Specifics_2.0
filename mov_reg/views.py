@@ -14,7 +14,7 @@ sug_sales=['Party','ACofParty',]
 not_varied=['Party','ACofParty','Movement','PartyRef','From','To1','To2','InvoiceNo']
 sug_mov=['Party','ACofParty','From','To1','To2','VehicleNo','Driver_Name','TransporterName']
 calc_data=['Alloted_Diesel','Fixed_Diesel_Advance','Fixed_Advance']
-cols=['id','Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Fixed_Diesel_Advance','Status','Driver_Name']
+cols=['Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Fixed_Diesel_Advance','Status','Driver_Name']
 today=date.today().strftime("%d-%m-%Y")
 def get_key(val,my_dict):
     for key, value in my_dict.items():
@@ -206,11 +206,11 @@ def FilterView(request):
                 ranges=[item for sublist in ranges for item in sublist]
             except:
                 pass
-            objs=Movement.objects.filter(**{val['search_in'][0]+'__in':ranges}).exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(*val['display_col'])
+            objs=Movement.objects.filter(**{val['search_in'][0]+'__in':ranges}).exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(*(val['display_col']+['id']))
         if 'Update' in request.POST:
              objs.update(**{val['search_in'][0]:val['update'][0].upper()})
              message='Updated Successfully for checking press Display'
-             return render(request,'filter.html',{'cols':cols,'today':today,'message':message,'search_for':val['update'][0].upper()})
+             return render(request,'filter.html',{'cols':cols,'today':today,'message':message,'search_for':val['update'][0].upper(),'search_in':val['search_in'][0]})
         elif 'Export' in request.POST:
             return ExcelResponse(objs)
         elif 'veh_stat' in request.POST:
@@ -225,7 +225,7 @@ def FilterView(request):
             table=df.to_html(escape=False)
             return render(request,'table.html',{'table':table})
         else:
-             df = pd.DataFrame(objs,columns=val['display_col'])
+             df = pd.DataFrame(objs,columns=val['display_col']+['id'])
              df['View']=""
              df['Edit']=""
              df['Delete']=""
@@ -234,6 +234,7 @@ def FilterView(request):
                 df['Edit'][i]=format_html('<a href=movement/'+'edit/'+str(df['id'][i])+'>(Edit)</a>')
                 df['Delete'][i]=format_html('<a href=movement/'+str(df['id'][i])+'/delete/>(Delete)</a>')
              df.index+=1
+             df.drop('id',axis=1,inplace=True)
              table=df.to_html(escape=False)
              return render(request,'table.html',{'table':table})
     return render(request,'filter.html',{'cols':cols,'today':today})

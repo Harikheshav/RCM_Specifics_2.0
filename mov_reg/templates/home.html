@@ -9,7 +9,7 @@ Movement Register
 	<ul>
 	{% for post in object_list %}
 		<li><a href="{% url 'mov_details' post.pk %}">{{post.Party}} - {{post.ACofParty}}<br/>
-		{{post.PartyRef}}-{{post.ContainerNo}}-{{post.Status}}</a>-<a href="{% url 'update_mov' post.pk %}">(Edit)</a>
+		{{post.PartyRef}}-{{post.VehicleNo}}-{{post.ContainerNo}}-{{post.Status}}</a>-<a href="{% url 'update_mov' post.pk %}">(Edit)</a>
 		-<a href="{% url 'delete_mov' post.pk %}">(Delete)</a></li>
 	{% endfor %}
 	</ul>

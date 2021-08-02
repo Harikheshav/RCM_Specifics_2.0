@@ -21,7 +21,7 @@ Example:20-12-2020:24-12-2020,15-01-2020:24-01-2020</li> <br/>
 <div class="form-group">
 <form method ="POST">
 	{% csrf_token %}
-	<select  name="search_in" value="choice">
+	<select  name="search_in" value="choices">
 	<option value="">-------</option>
 	{% for col in cols %}
 	<option value="{{col}}">{{col}}</option>
