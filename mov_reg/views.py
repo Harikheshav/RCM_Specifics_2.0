@@ -197,7 +197,7 @@ def FilterView(request):
     if request.POST:
         val=dict(request.POST.lists())
         if val['search_in'][0] == '':
-            objs=Movement.objects.all().exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(*val['display_col'])
+            objs=Movement.objects.all().exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(*(val['display_col']+['id']))
         else:
             search_for=val['search_for'][0].upper()
             ranges = search_for.split(',')
