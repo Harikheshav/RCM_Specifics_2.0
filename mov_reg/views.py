@@ -4,9 +4,11 @@ from .models import Movement,Vehicle_Detail
 from .forms import MovementForm,FileForm,Vehicle_Detail_Form
 from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
+from .app_config import rcm_drivers,rcm_place_adv,rcm_veh_nos,rcm_drivers_mob_no
 import os
 import pandas as pd
-from excel_response import ExcelResponse
+import io
+import xlsxwriter
 from django.utils.html import format_html
 from datetime import date,timedelta,datetime
 path='Template.xlsx'
@@ -26,12 +28,6 @@ def suggest(col_name):
         df=pd.DataFrame(list(Movement.objects.all().values()))
     except:
         df=pd.DataFrame(columns=cols)
-    try:
-        rcm_drivers_mob_no=pd.read_excel(path,na_filter=False,sheet_name='Driver_Mobile').to_dict()
-        rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
-    except:
-        rcm_drivers_mob_no={}
-        rcm_drivers=[]      
     if df.empty:
         return []
     elif col_name=='Driver_Name':
@@ -43,10 +39,6 @@ def validate_file(value):
             if not value.name.endswith('Template.xlsx'):
                 raise forms.ValidationError("Not the same file")
 def calc_fixed(From=None,To_1=None,To_2=None):
-    try:
-        rcm_place_adv=pd.read_excel(path,na_filter=False,sheet_name='Place_Advance').values.tolist()
-    except:
-        rcm_place_adv=[]   
     for data in rcm_place_adv:
         if data[0]==From and data[1]==To_1 and data[2]==To_2:
             return data[3],data[4],data[5]
@@ -123,11 +115,6 @@ class DeleteMovView(UpdateView):
 def VehicleView(request):
         fields=['id','VehicleNo','CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount','TripSheetDate']
         amounts=['CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount']
-        try:
-            rcm_veh_nos=pd.read_excel(path,na_filter=False,sheet_name='Vehicle Numbers').values.tolist()
-            rcm_veh_nos=[item for sublist in rcm_veh_nos for item in sublist]
-        except:
-            rcm_veh_nos=[]
         objs=list(Movement.objects.filter(VehicleNo__in = rcm_veh_nos).values(*fields))
         for obj in objs:
             for amount in amounts:
@@ -165,11 +152,6 @@ def VehicleDetailView(request,veh_no):
         return render(request,'veh_details.html',{'objs':objs,'veh_no':veh_no,'daterange':daterange,'total_inc':total_inc,'total_exp':total_exp,'total':total})
     return render(request,'veh_details.html',{'objs':objs,'veh_no':veh_no,'total_inc':total_inc,'total_exp':total_exp,'total':total})
 def Vehicle(request):
-    try:
-        rcm_veh_nos=pd.read_excel(path,na_filter=False,sheet_name='Vehicle Numbers').values.tolist()
-        rcm_veh_nos=[item for sublist in rcm_veh_nos for item in sublist]
-    except:
-          rcm_veh_nos=[]
     if request.method == 'POST':
         form = Vehicle_Detail_Form(request.POST)
         if form.is_valid():
@@ -188,12 +170,30 @@ def FilterView(request):
                 daterange.append(end)
                 daterange = [dat.strftime("%d-%m-%Y") for dat in daterange]
                 return daterange
-    try:
-        rcm_drivers_mob_no=pd.read_excel(path,na_filter=False,sheet_name='Driver_Mobile').to_dict()
-        rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
-    except:
-        rcm_drivers_mob_no={}
-        rcm_drivers=[]  
+    
+    def printColName(n):
+         
+        arr = [0] * 10000
+        i = 0
+     
+        # Step 1: Converting to number
+        # assuming 0 in number system
+        while (n > 0):
+            arr[i] = n % 26
+            n = int(n // 26)
+            i += 1
+             
+        #Step 2: Getting rid of 0, as 0 is
+        # not part of number system
+        for j in range(0, i - 1):
+            if (arr[j] <= 0):
+                arr[j] += 26
+                arr[j + 1] = arr[j + 1] - 1
+        val = '' 
+        for j in range(i, -1, -1):
+            if (arr[j] > 0):
+                val = val + (chr(ord('A') + (arr[j] - 1)))   
+        return  val
     if request.POST:
         val=dict(request.POST.lists())
         if val['search_in'][0] == '':
@@ -212,7 +212,41 @@ def FilterView(request):
              message='Updated Successfully'
              return render(request,'filter.html',{'cols':cols,'today':today,'message':message})
         elif 'Export' in request.POST:
-            return ExcelResponse(objs)
+            output = io.BytesIO()
+            workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+            worksheet = workbook.add_worksheet()
+            i=2
+            disp_cols = val['display_col']
+            #Column Naming (A1=cols[0]:Z1=cols[Z-1])
+            for col in disp_cols:
+                worksheet.write(printColName(i)+'1', col)
+                i+=1
+            #Column Naming (A2=1:AZ=Z-1)
+            for i in range(len(list(objs))+2):
+                if i == 1:
+                    worksheet.write('A'+str(i), 'S.No')
+                else:
+                    worksheet.write('A'+str(i), str(i-1))
+            i = j = 2
+            for obj in objs:
+                j=2 #(Back to X2)
+                for col in disp_cols:
+                    worksheet.write(printColName(j)+str(i), obj[col])
+                    j+=1
+                i+=1
+            # Close the workbook before sending the data.
+            workbook.close()
+            # Rewind the buffer.
+            output.seek(0)
+            # Set up the Http response.
+            response = HttpResponse(
+                output,
+                content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            )
+            # response['Content-Disposition'] = 'attachment; filename=%s' % filename
+            response['Content-Disposition'] = 'attachment; filename="data.xlsx"'
+
+            return response
         elif 'veh_stat' in request.POST:
             df = pd.DataFrame(Movement.objects.all().exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(),columns=['VehicleNo','Driver_Name','From','To1','To2','Party','Status','TripSheetDate','TransporterName'])
             df=df[(df['TripSheetDate'].str.contains(val['date'][0])) & (df['TransporterName'].str.contains('RCM'))]
@@ -243,11 +277,21 @@ def delete_file(request):
     return redirect('upload')
 def FileUpload(request):
     path_exists=os.path.exists('Template.xlsx')
+    global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
+    if path_exists:
+        rcm_veh_nos=pd.read_excel(path,na_filter=False,sheet_name='Vehicle Numbers').values.tolist()
+        rcm_veh_nos=[item for sublist in rcm_veh_nos for item in sublist]
+        rcm_place_adv=pd.read_excel(path,na_filter=False,sheet_name='Place_Advance').values.tolist()
+        rcm_drivers_mob_no=pd.read_excel(path,na_filter=False,sheet_name='Driver_Mobile').to_dict()
+        rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
+        note='Suggestions Filled..... Example:'+rcm_veh_nos[0]+','+rcm_place_adv[0][0]+','+rcm_drivers[0]
+    else:
+        note = 'Suggestions Empty'
     if request.method == 'POST':
         form = FileForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            return redirect('home')
+            return redirect('upload')
     else:
         form = FileForm()
-    return render(request, 'upload.html', {'form': form,'path_exists':path_exists})    
+    return render(request, 'upload.html', {'form': form,'path_exists':path_exists,'note':note})    

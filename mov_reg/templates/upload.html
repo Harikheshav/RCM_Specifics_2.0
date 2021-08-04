@@ -26,7 +26,7 @@
 	<br/>
 	{%if request.session.file_state %}
 		<h3>File has been deleted.</h3>
-	{% endif %}	
+	{% endif %}
 	{%if path_exists %}
 			<h3>The Sample File already exists press, <a href="{%url 'delete_file' %}">delete</a> to delete the file....</h3>
 	{% else %}
@@ -38,6 +38,7 @@
 	 </form>
 	 </h3>
 	{% endif %}
+	<br/><b>Note:{{note}}</b>
 {% else %}
 		Please ask your admin to add you in "Officer"
 {% endif %}
