@@ -9,6 +9,7 @@ import os
 import pandas as pd
 import io
 import xlsxwriter
+import random
 from django.utils.html import format_html
 from datetime import date,timedelta,datetime
 cols=['Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Fixed_Diesel_Advance','Status','Driver_Name']
@@ -157,7 +158,10 @@ def FileUpload(request):
     rcm_drivers_mob_no = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
     googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).to_dict()
     rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
-    note='Sample Data:'+rcm_veh_nos[0]+','+rcm_place_adv[0][0]+','+rcm_drivers[0]  
+    try:
+        note='Sample Data:'+random.choice(rcm_veh_nos)+random.choice(rcm_place_adv[0])+random.choice(rcm_drivers)
+    except:
+        note='No Data'
     return render(request,'upload.html',{'note':note,'sheet_id':googleSheetId})
 def FilterView(request):
     def range_days(rangestr):
