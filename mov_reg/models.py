@@ -18,8 +18,6 @@ class Vehicle_Detail(models.Model):
             if val:
                 setattr(self,f,val.upper())
         super(Vehicle_Detail,self).save(*args,**kwargs)
-class File(models.Model):
-    file = models.FileField(upload_to='')
 class Movement(models.Model):
     Party =	models.CharField(max_length=50,null=True,blank=True)
     ACofParty = models.CharField(max_length=50,null=True,blank=True)

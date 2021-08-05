@@ -1,16 +1,7 @@
 from django import forms
-from .models import Movement,File,Vehicle_Detail
+from .models import Movement,Vehicle_Detail
 import os
 import floppyforms
-def validate_file(value):
-    if not value.name.startswith('Template.xlsx'):
-            if not value.name.endswith('Template.xlsx'):
-                raise forms.ValidationError("Not the same file")
-class FileForm(forms.ModelForm):
-    file = forms.FileField(validators=[validate_file])
-    class Meta:
-        model = File
-        fields = ('file',)
 class Vehicle_Detail_Form(forms.ModelForm):
     class Meta:
         model = Vehicle_Detail
