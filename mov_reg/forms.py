@@ -1,6 +1,5 @@
 from django import forms
 from .models import Movement,Vehicle_Detail
-import os
 import floppyforms
 class Vehicle_Detail_Form(forms.ModelForm):
     class Meta:

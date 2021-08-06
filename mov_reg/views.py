@@ -116,6 +116,7 @@ class AddMovView_Empty(CreateView):
             context['form'].fields[field].widget.datalist=suggest(field)
         context['form'].fields['Size'].widget.datalist=[20,40]
         context['form'].fields['Movement'].widget.datalist=['Import','Export','Offload','Empty']
+        context['form'].fields['TripSheetDate'].initial = today
         return context
     def post(self, request, *args, **kwargs):
         form = MovementForm(request.POST)
@@ -339,4 +340,6 @@ def Vehicle(request):
     else:
         form = Vehicle_Detail_Form()
         form.fields['VehicleNo'].widget.datalist=rcm_veh_nos
+        form.fields['Date'].initial = today
+
     return render(request,'vehicle.html',{'form':form})

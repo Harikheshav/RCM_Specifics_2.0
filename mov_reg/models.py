@@ -1,14 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
-from datetime import date
 # Create your models here.
 class Vehicle_Detail(models.Model):
     VehicleNo = models.CharField(max_length=10,default=None)
     Amount = models.IntegerField()
     Reason = models.CharField(max_length=100,default=None)
     Reason_Id = models.IntegerField(default=0)
-    Date = models.CharField(max_length=10,default=date.today().strftime("%d-%m-%Y"))
+    Date = models.CharField(max_length=10)
     def save(self,*args,**kwargs):
         char_fields = [f.name for f in Vehicle_Detail._meta.fields if isinstance(f, models.CharField)]
         if getattr(self,'Reason',False) != 'InvoiceNo':
@@ -35,7 +34,7 @@ class Movement(models.Model):
     InvoiceAmount =	models.IntegerField(null=True,blank=True)
     TripSheetNo = models.IntegerField(null=True,blank=True)
     TripSheetAmount =	models.IntegerField(null=True,blank=True)
-    TripSheetDate	= models.CharField(max_length=10,null=True,blank=True,default=date.today().strftime("%d-%m-%Y"))
+    TripSheetDate	= models.CharField(max_length=10,null=True,blank=True)
     CashAdvance =	models.IntegerField(null=True,blank=True)
     ChequeAdvance =	models.IntegerField(null=True,blank=True)
     Fixed_Advance =	models.IntegerField(null=True,blank=True)
