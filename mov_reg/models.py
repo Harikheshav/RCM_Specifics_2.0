@@ -41,7 +41,6 @@ class Movement(models.Model):
     Diesel =	models.IntegerField(null=True,blank=True)
     Alloted_Diesel =	models.IntegerField(null=True,blank=True)
     Diesel_Advance	= models.IntegerField(null=True,blank=True)
-    Fixed_Diesel_Advance =	models.IntegerField(null=True,blank=True)
     Status	= models.CharField(max_length=10,null=True,blank=True)
     Driver_Name = models.CharField(max_length=10,null=True,blank=True)
     def get_absolute_url(self):

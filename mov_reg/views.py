@@ -12,10 +12,10 @@ import xlsxwriter
 import random
 from django.utils.html import format_html
 from datetime import date,timedelta,datetime
-cols=['Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Fixed_Diesel_Advance','Status','Driver_Name']
+cols=['Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Status','Driver_Name']
 not_varied=['Party','ACofParty','Movement','PartyRef','From','To1','To2','InvoiceNo']
 sug_mov=['Party','ACofParty','From','To1','To2','VehicleNo','Driver_Name','TransporterName']
-calc_data=['Alloted_Diesel','Fixed_Diesel_Advance','Fixed_Advance']
+calc_data=['Alloted_Diesel','Fixed_Advance']
 googleSheetId = os.environ['googleSheetId']
 today=date.today().strftime("%d-%m-%Y")
 def get_key(val,my_dict):
@@ -37,8 +37,8 @@ def suggest(col_name):
 def calc_fixed(From=None,To_1=None,To_2=None):
     for data in rcm_place_adv:
         if data[0]==From and data[1]==To_1 and data[2]==To_2:
-            return data[3],data[4],data[5]
-    return 0,0,0
+            return data[3],data[4]
+    return 0,0
 def index(request):
     if request.user.is_authenticated:
         return redirect('home')
@@ -92,7 +92,7 @@ class AddMovView_Initial(CreateView):
             return self.form_valid(form)
     def form_valid(self, form):
         instances = form.save(commit=False)
-        instances.Alloted_Diesel,instances.Fixed_Advance,instances.Fixed_Diesel_Advance= calc_fixed(instances.From,instances.To1,instances.To2)
+        instances.Alloted_Diesel,instances.Fixed_Advance= calc_fixed(str(instances.From),str(instances.To1),str(instances.To2))
         instances.save()
         return HttpResponseRedirect('/add_mov_init')
 class AddMovView_Empty(CreateView):
@@ -124,7 +124,7 @@ class AddMovView_Empty(CreateView):
             return self.form_valid(form)
     def form_valid(self, form):
         instances = form.save(commit=False)
-        instances.Alloted_Diesel,instances.Fixed_Advance,instances.Fixed_Diesel_Advance= calc_fixed(str(instances.From),str(instances.To1),str(instances.To2))
+        instances.Alloted_Diesel,instances.Fixed_Advance = calc_fixed(str(instances.From),str(instances.To1),str(instances.To2))
         instances.save()
         return HttpResponseRedirect('/add_mov_init')
 class UpdateMovView(UpdateView):
@@ -142,7 +142,7 @@ class UpdateMovView(UpdateView):
         googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).to_dict()
         rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
     def form_valid(self, form):
-        form.instance.Alloted_Diesel,form.instance.Fixed_Advance,form.instance.Fixed_Diesel_Advance= calc_fixed(str(form.instance.From),str(form.instance.To1),str(form.instance.To2)) 
+        form.instance.Alloted_Diesel,form.instance.Fixed_Advance = calc_fixed(str(form.instance.From),str(form.instance.To1),str(form.instance.To2)) 
         return super().form_valid(form)
 class DeleteMovView(UpdateView):
     model=Movement

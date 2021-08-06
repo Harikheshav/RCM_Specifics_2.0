@@ -19,7 +19,7 @@ class MovementForm(forms.ModelForm):
     class Meta:
         model=Movement
         fields='__all__'
-        exclude=['Alloted_Diesel','Fixed_Advance','Fixed_Diesel_Advance']
+        exclude=['Alloted_Diesel','Fixed_Advance']
         widgets={
         'Party':floppyforms.TextInput(
         attrs={'class':'form-control','autocomplete': 'off'}), 
