@@ -263,7 +263,6 @@ def FilterView(request):
             df=df.drop(['TransporterName','TripSheetDate'],axis=1)
             try:
                 c_keys=[get_key(item,rcm_drivers_mob_no['Driver Name']) for item in df['Driver_Name'].to_string(index=False).split()] #Both Mob no and Dri_name has common key
-                vals=c_keys
                 df['Mobile No']=[rcm_drivers_mob_no['Mobile Number'][c_key] for c_key in c_keys ] #Reading mobile number based on common key
                 df['Mobile No']=df['Mobile No'].astype(int)
             except:
