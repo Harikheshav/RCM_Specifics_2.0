@@ -22,7 +22,6 @@ def get_key(val,my_dict):
     for key, value in my_dict.items():
          if val in value:
              return key
-    return 0              
 def suggest(col_name):
     try:
         df=pd.DataFrame(list(Movement.objects.all().values()))
