@@ -247,10 +247,10 @@ def FilterView(request):
                 content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
             )
             response['Content-Disposition'] = 'attachment; filename="data.xlsx"'
-
             return response
         elif 'veh_stat' in request.POST:
             df = pd.DataFrame(Movement.objects.all().exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).values(),columns=['VehicleNo','Driver_Name','From','To1','To2','Party','Status','TripSheetDate','TransporterName'])
+            pd.set_option('max_colwidth', None)
             df=df[(df['TripSheetDate'].str.contains(val['date'][0])) & (df['TransporterName'].str.contains('RCM'))]
             df=df.drop(['TransporterName','TripSheetDate'],axis=1)
             try:
@@ -259,8 +259,9 @@ def FilterView(request):
             except:
                 df['Mobile No']='Not Stored'
             table=df.to_html(escape=False)
-            return render(request,'table.html',{'table':table})
+            return render(request,'table.html',{'table':table,'veh_stat':True})
         else:
+             pd.set_option('max_colwidth', None)
              df = pd.DataFrame(objs,columns=val['display_col']+['id'])
              df['View']=""
              df['Edit']=""
@@ -272,7 +273,7 @@ def FilterView(request):
              df.index+=1
              df.drop('id',axis=1,inplace=True)
              table=df.to_html(escape=False)
-             return render(request,'table.html',{'table':table})
+        return render(request,'table.html',{'table':table,'veh_stat':False})
     return render(request,'filter.html',{'cols':cols,'today':today})
 def VehicleView(request):
         fields=['id','VehicleNo','CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount','TripSheetDate']
