@@ -165,6 +165,15 @@ def FileUpload(request):
         note='No Data'
     return render(request,'upload.html',{'note':note,'sheet_id':googleSheetId})
 def FilterView(request):
+    global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
+    rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+    googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
+    rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
+    'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
+    rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
+    rcm_drivers_mob_no = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+    googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).to_dict()
+    rcm_drivers=list(rcm_drivers_mob_no['Driver Name'].values())
     def range_days(rangestr):
                 [start,end] = rangestr.split(':')
                 start = datetime.strptime(start,"%d-%m-%Y")
@@ -255,6 +264,7 @@ def FilterView(request):
             df=df.drop(['TransporterName','TripSheetDate'],axis=1)
             try:
                 c_keys=[get_key(item,rcm_drivers_mob_no['Driver Name']) for item in df['Driver_Name'].to_string(index=False).split()] #Both Mob no and Dri_name has common key
+                vals=c_keys
                 df['Mobile No']=[rcm_drivers_mob_no['Mobile Number'][c_key] for c_key in c_keys ] #Reading mobile number based on common key
                 df['Mobile No']=df['Mobile No'].astype(int)
             except:
