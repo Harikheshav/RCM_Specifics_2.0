@@ -145,10 +145,6 @@ class UpdateMovView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super(UpdateMovView, self).get_context_data(**kwargs)
         context['form'] = MovementForm()
-        for field in sug_mov:
-            context['form'].fields[field].widget.datalist=suggest(field)
-        context['form'].fields['Size'].widget.datalist=[20,40]
-        context['form'].fields['Movement'].widget.datalist=['Import','Export','Offload','Empty']
         return context
     def form_valid(self, form):
         form.instance.Alloted_Diesel,form.instance.Fixed_Advance = calc_fixed(str(form.instance.From),str(form.instance.To1),str(form.instance.To2)) 
