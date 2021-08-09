@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from . import views
 from .views import HomeView,MovDetailView,AddMovView_Empty,AddMovView_Initial,UpdateMovView,DeleteMovView
 urlpatterns = [
-path('',views.index,name="index"),
+path('index',views.index,name="index"),
 path('home',HomeView.as_view(),name="home"),
 path('movement/<int:pk>',MovDetailView.as_view(),name="mov_details"),
 path('add_mov_init',AddMovView_Initial.as_view(),name="add_mov_init"),
