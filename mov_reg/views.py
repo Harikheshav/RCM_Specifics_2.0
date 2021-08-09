@@ -18,10 +18,6 @@ sug_mov=['Party','ACofParty','From','To1','To2','VehicleNo','Driver_Name','Trans
 calc_data=['Alloted_Diesel','Fixed_Advance']
 googleSheetId = os.environ['googleSheetId']
 today=date.today().strftime("%d-%m-%Y")
-def get_key(val,my_dict):
-    for key, value in my_dict.items():
-         if val in value:
-             return key
 def suggest(col_name):
     try:
         df=pd.DataFrame(list(Movement.objects.all().values()))
@@ -35,7 +31,7 @@ def suggest(col_name):
         return list(filter(None,set(df[col_name].values.tolist())))
 def calc_fixed(From=None,To_1=None,To_2=None):
     for data in rcm_place_adv:
-        if data[0].upper()==From and data[1].upper()==To_1 and data[2].upper()==To_2:
+        if data[0].upper()==From.upper() and data[1].upper()==To_1.upper() and data[2].upper()==To_2.upper():
             return data[3],data[4]
     return 0,0
 def index(request):
