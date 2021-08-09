@@ -39,6 +39,8 @@ def index(request):
         return redirect('home')
     else:
         return redirect('/login')
+def install(request):
+    return render(request,'install_app.html')
 class HomeView(ListView):
     model=Movement
     template_name='home.html'
