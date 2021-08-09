@@ -20,4 +20,5 @@ urlpatterns = [
     path('', include('mov_reg.urls')),
     path('', include('django.contrib.auth.urls' )),
     path('', include('members.urls')),
+    path('', include('pwa.urls')),
 ]
