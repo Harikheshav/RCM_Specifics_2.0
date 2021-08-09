@@ -6,7 +6,7 @@
 	"sizes" : "512x512",
 	"type" : "image/png"
 	}],
-	"start_url" : "/login",
+	"start_url" : "https://rcm-specs.herokuapp.com/",
 	"display" : "standalone",
 	"orientation" : "portrait",
 	"background_color" : "#FF0000"
