@@ -81,7 +81,7 @@ class AddMovView_Initial(CreateView):
         initial_dict=Movement.objects.filter(id=Id).values()[0]
         initial_dict = {key: initial_dict[key] for key  in not_varied}
         context['form'] = MovementForm(initial=initial_dict)
-        for field in sug_mov:
+        for field in cols:
             context['form'].fields[field].widget.datalist=suggest(field)
         context['form_message']='The form has been saved!!!!!'
         return context
@@ -122,11 +122,18 @@ class UpdateMovView(UpdateView):
     model=Movement
     form_class= MovementForm
     template_name='update_mov.html'
-    def __init__(self):
-        ready()
     def get_context_data(self, **kwargs):
         context = super(UpdateMovView, self).get_context_data(**kwargs)
         context['form'] = MovementForm()
+        for field in sug_mov:
+            context['form'].fields[field].widget.datalist=suggest(field)
+        pk = self.get_object().pk
+        obj=Movement.objects.get(pk=pk)
+        for field in list(set(cols)- set(calc_data)):
+            context['form'].fields[field].initial=obj.__getattribute__(field)
+        context['form'].fields['Size'].widget.datalist=[20,40]
+        context['form'].fields['Movement'].widget.datalist=['Import','Export','Offload','Empty']
+        context['form'].fields['TripSheetDate'].initial = today
         return context
     def form_valid(self, form):
         form.instance.Alloted_Diesel,form.instance.Fixed_Advance = calc_fixed(str(form.instance.From),str(form.instance.To1),str(form.instance.To2)) 

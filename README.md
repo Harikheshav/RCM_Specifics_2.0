@@ -1,4 +1,4 @@
-# RCM_Specifics_2.0_Web_App
+# RCM_Specifics_2.0
 RCM Specifics was a Data Entry and Processing App, based on Tkinter with suggestion system. 
 It was deployed as a Windows Executable.
 But the app had a disadvantage that, it could only be deployed on in Windows, in a single device or maximum a set of systems connected through LAN. 

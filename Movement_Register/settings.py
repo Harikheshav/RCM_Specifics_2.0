@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 PWA_SERVICE_WORKER_PATH = os.path.join(BASE_DIR, 'static/js', 'serviceworker.js')
 
-PWA_APP_NAME = 'RCM_Specifics'
+PWA_APP_NAME = 'RCM Specifics'
 PWA_APP_DESCRIPTION = "Application For adding Movement Details"
 PWA_APP_THEME_COLOR = '#000000'
 PWA_APP_BACKGROUND_COLOR = '#ffffff'
