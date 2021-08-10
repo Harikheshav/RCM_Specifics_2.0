@@ -1,1 +1,0 @@
-default_app_config = 'mov_reg.app_config.MovementConfig'

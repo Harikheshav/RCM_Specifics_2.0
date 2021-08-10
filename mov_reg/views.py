@@ -4,20 +4,38 @@ from .models import Movement,Vehicle_Detail
 from .forms import MovementForm,Vehicle_Detail_Form
 from django.urls import reverse_lazy
 from django.http import HttpResponse, HttpResponseRedirect
-from .app_config import rcm_drivers,rcm_place_adv,rcm_veh_nos,rcm_drivers_mob_no
 import os
 import pandas as pd
 import io
 import xlsxwriter
 import random
 from django.utils.html import format_html
+from django.db.models import Q
 from datetime import date,timedelta,datetime
+rcm_drivers = [] 
+rcm_place_adv = []
+rcm_veh_nos = []
+rcm_drivers_mob_no = {}
 cols=['Party','ACofParty','Movement','Size','PartyRef','ContainerNo','From','To1','To2','VehicleNo','TransporterName','InvoiceNo','InvoiceDate','InvoiceAmount','TripSheetNo','TripSheetAmount','TripSheetDate','CashAdvance','ChequeAdvance','Fixed_Advance','Diesel','Alloted_Diesel','Diesel_Advance','Status','Driver_Name']
 not_varied=['Party','ACofParty','Movement','PartyRef','From','To1','To2','InvoiceNo']
 sug_mov=['Party','ACofParty','From','To1','To2','VehicleNo','Driver_Name','TransporterName']
 calc_data=['Alloted_Diesel','Fixed_Advance']
 googleSheetId = os.environ['googleSheetId']
 today=date.today().strftime("%d-%m-%Y")
+def ready():
+     global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
+     rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+     googleSheetId,
+     'Place_Advance')).dropna(how='all', axis=1).values.tolist()
+     rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+     googleSheetId,'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
+     rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
+     rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
+     googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
+     rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
+     rcm_drivers=list(rcm_drivers_mob_no.keys())
+     delete_query = Q(Party__isnull = True) | Q(Party__exact = '') | Q(Party__exact = None)
+     Movement.objects.filter(delete_query).delete()
 def suggest(col_name):
     try:
         df=pd.DataFrame(list(Movement.objects.all().values()))
@@ -45,16 +63,7 @@ class HomeView(ListView):
     model=Movement
     template_name='home.html'
     def __init__(self):
-        global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-        rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-        'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-        rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-            googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-        rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-        rcm_drivers=list(rcm_drivers_mob_no.keys())
+        ready()
     def get_queryset(self):
         return Movement.objects.exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).order_by('-id')
 class MovDetailView(DetailView):
@@ -65,16 +74,7 @@ class AddMovView_Initial(CreateView):
     form_class= MovementForm
     template_name='add_mov.html'
     def __init__(self):
-        global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-        rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-        'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-        rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-            googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-        rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-        rcm_drivers=list(rcm_drivers_mob_no.keys())
+        ready()
     def get_context_data(self, **kwargs):
         context = super(AddMovView_Initial, self).get_context_data(**kwargs)
         Id = int(str(Movement.objects.last()).split('(')[1].split(')')[0])
@@ -99,16 +99,7 @@ class AddMovView_Empty(CreateView):
     form_class= MovementForm
     template_name='add_mov.html'
     def __init__(self):
-        global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-        rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-        'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-        rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-            googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-        rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-        rcm_drivers=list(rcm_drivers_mob_no.keys())
+        ready()
     def get_context_data(self, **kwargs):
         context = super(AddMovView_Empty, self).get_context_data(**kwargs)
         context['form'] = MovementForm()
@@ -132,16 +123,7 @@ class UpdateMovView(UpdateView):
     form_class= MovementForm
     template_name='update_mov.html'
     def __init__(self):
-        global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-        rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-        'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-        rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-            googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-        rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-        rcm_drivers=list(rcm_drivers_mob_no.keys())
+        ready()
     def get_context_data(self, **kwargs):
         context = super(UpdateMovView, self).get_context_data(**kwargs)
         context['form'] = MovementForm()
@@ -155,32 +137,14 @@ class DeleteMovView(UpdateView):
     fields='__all__'
     success_url=reverse_lazy('home')
 def FileUpload(request):
-    global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-    rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-    googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-    'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-    rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-    rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-    rcm_drivers=list(rcm_drivers_mob_no.keys())
+    ready()
     try:
         note='Sample Data:'+random.choice(rcm_veh_nos)+random.choice(rcm_place_adv[0])+random.choice(rcm_drivers)
     except:
         note='No Data'
     return render(request,'upload.html',{'note':note,'sheet_id':googleSheetId})
 def FilterView(request):
-    global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-    rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-    googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-    'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = [item.upper() for sublist in rcm_veh_nos for item in sublist]
-    rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-    rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-    rcm_drivers=list(rcm_drivers_mob_no.keys())
+    ready()
     def range_days(rangestr):
                 [start,end] = rangestr.split(':')
                 start = datetime.strptime(start,"%d-%m-%Y")
@@ -291,19 +255,9 @@ def FilterView(request):
         return render(request,'table.html',{'table':table,'veh_stat':False})
     return render(request,'filter.html',{'cols':cols,'today':today})
 def VehicleView(request):
+        ready()
         fields=['id','VehicleNo','CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount','TripSheetDate']
         amounts=['CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount']
-        global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-        rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-        'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-        rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-        rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-            googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-        rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-        rcm_drivers=list(rcm_drivers_mob_no.keys())
-        objs=list(Movement.objects.filter(VehicleNo__in = rcm_veh_nos).values(*fields))
         for obj in objs:
             for amount in amounts:
                 veh_obj = Vehicle_Detail(VehicleNo=obj['VehicleNo'],Amount=obj[amount],Reason=amount,Reason_Id=obj['id'],Date=obj['TripSheetDate'])
@@ -320,16 +274,7 @@ def VehicleView(request):
         total=total_inc+total_exp
         return render(request,'veh_list.html',{'veh_nos':rcm_veh_nos,'total_inc':total_inc,'total_exp':total_exp,'total':total})
 def VehicleDetailView(request,veh_no):
-    global rcm_veh_nos,rcm_drivers,rcm_drivers_mob_no,rcm_place_adv
-    rcm_place_adv = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-    googleSheetId,'Place_Advance')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(googleSheetId,
-    'Vehicle_Numbers')).dropna(how='all', axis=1).values.tolist()
-    rcm_veh_nos = [item for sublist in rcm_veh_nos for item in sublist]
-    rcm_drivers_mob_no = dict(pd.read_csv('https://docs.google.com/spreadsheets/d/{0}/gviz/tq?tqx=out:csv&sheet={1}'.format(
-        googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
-    rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
-    rcm_drivers=list(rcm_drivers_mob_no.keys())
+    ready()
     objs=Vehicle_Detail.objects.filter(VehicleNo=veh_no).values()
     vals=list(objs.values())
     total_inc = sum(val['Amount'] for val in vals if val['Amount']> 0 )
@@ -350,6 +295,7 @@ def VehicleDetailView(request,veh_no):
         return render(request,'veh_details.html',{'objs':objs,'veh_no':veh_no,'daterange':daterange,'total_inc':total_inc,'total_exp':total_exp,'total':total})
     return render(request,'veh_details.html',{'objs':objs,'veh_no':veh_no,'total_inc':total_inc,'total_exp':total_exp,'total':total})
 def Vehicle(request):
+    ready()
     if request.method == 'POST':
         form = Vehicle_Detail_Form(request.POST)
         if form.is_valid():
