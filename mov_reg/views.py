@@ -34,8 +34,6 @@ def ready():
      googleSheetId,'Driver_Mobile')).dropna(how='all', axis=1).values)
      rcm_drivers_mob_no = {k.upper():v for k,v in rcm_drivers_mob_no.items()}
      rcm_drivers=list(rcm_drivers_mob_no.keys())
-     delete_query = Q(Party__isnull = True) | Q(Party__exact = '') | Q(Party__exact = None)
-     Movement.objects.filter(delete_query).delete()
 def suggest(col_name):
     try:
         df=pd.DataFrame(list(Movement.objects.all().values()))
@@ -63,6 +61,8 @@ class HomeView(ListView):
     model=Movement
     template_name='home.html'
     def __init__(self):
+        delete_query = Q(Party__isnull = True) | Q(Party__exact = '') | Q(Party__exact = None)
+        Movement.objects.filter(delete_query).delete()
         ready()
     def get_queryset(self):
         return Movement.objects.exclude(Party__isnull = True).exclude(Party__exact = '').exclude(Party__exact = None).order_by('-id')
