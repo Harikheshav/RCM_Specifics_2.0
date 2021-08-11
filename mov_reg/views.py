@@ -263,6 +263,7 @@ def FilterView(request):
     return render(request,'filter.html',{'cols':cols,'today':today})
 def VehicleView(request):
         ready()
+        objs = Movement.objects.filter(VehicleNo = rcm_veh_nos)
         fields=['id','VehicleNo','CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount','TripSheetDate']
         amounts=['CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount']
         for obj in objs:
