@@ -264,7 +264,7 @@ def FilterView(request):
 def VehicleView(request):
         ready()
         fields=['id','VehicleNo','CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount','TripSheetDate']
-        objs=list(Movement.objects.filter(VehicleNo__in = rcm_veh_nos).values(*fields)        
+        objs=list(Movement.objects.filter(VehicleNo__in = rcm_veh_nos).values(*fields))        
         amounts=['CashAdvance','ChequeAdvance','Diesel_Advance','TripSheetAmount','InvoiceAmount']
         for obj in objs:
             for amount in amounts:
