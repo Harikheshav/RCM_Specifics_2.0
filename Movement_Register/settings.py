@@ -41,7 +41,7 @@ PWA_APP_ICONS =[
             "type": "image/png"
         },
         {
-            "src": "static/imagesstatic/images/icon-384x384.png",
+            "src": "static/images/icon-384x384.png",
             "sizes": "384x384",
             "type": "image/png"
         },
@@ -75,24 +75,8 @@ PWA_APP_ICONS_APPLE = [
     ]
 PWA_APP_SPLASH_SCREEN =  [
         {
-            "src": "static/images/icon-192x192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "static/images/icon-256x256.png",
-            "sizes": "256x256",
-            "type": "image/png"
-        },
-        {
-            "src": "static/images/icon-384x384.png",
-            "sizes": "384x384",
-            "type": "image/png"
-        },
-        {
-            "src": "static/images/icon-512x512.png",
-            "sizes": "512x512",
-            "type": "image/png"
+            "src": "static/images/splash_screen.png",
+            'media': '(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)'
         }
     ]
 PWA_APP_DIR = 'ltr'
