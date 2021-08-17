@@ -81,8 +81,11 @@ class AddMovView_Initial(CreateView):
         initial_dict=Movement.objects.filter(id=Id).values()[0]
         initial_dict = {key: initial_dict[key] for key  in not_varied}
         context['form'] = MovementForm(initial=initial_dict)
-        for field in cols:
+        for field in sug_mov:
             context['form'].fields[field].widget.datalist=suggest(field)
+        context['form'].fields['Size'].widget.datalist=[20,40]
+        context['form'].fields['Movement'].widget.datalist=['Import','Export','Offload','Empty']
+        context['form'].fields['TripSheetDate'].initial = today
         context['form_message']='The form has been saved!!!!!'
         return context
     def post(self, request, *args, **kwargs):
