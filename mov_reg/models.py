@@ -4,7 +4,7 @@ from django.urls import reverse
 # Create your models here.
 class Vehicle_Detail(models.Model):
     VehicleNo = models.CharField(max_length=10,default=None)
-    Amount = models.IntegerField()
+    Amount = models.DecimalField(null=True,blank=True,max_digits=19, decimal_places=2)
     Reason = models.CharField(max_length=100,default=None)
     Reason_Id = models.IntegerField(default=0)
     Date = models.CharField(max_length=10)
