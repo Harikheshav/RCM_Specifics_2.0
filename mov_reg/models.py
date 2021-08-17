@@ -39,8 +39,8 @@ class Movement(models.Model):
     ChequeAdvance =	models.IntegerField(null=True,blank=True)
     Fixed_Advance =	models.IntegerField(null=True,blank=True)
     Diesel =	models.IntegerField(null=True,blank=True)
-    Alloted_Diesel =	models.IntegerField(null=True,blank=True)
-    Diesel_Advance	= models.IntegerField(null=True,blank=True)
+    Alloted_Diesel = models.DecimalField(null=True,blank=True,max_digits=19, decimal_places=2)
+    Diesel_Advance	= models.DecimalField(null=True,blank=True,max_digits=19, decimal_places=2)
     Status	= models.CharField(max_length=100,null=True,blank=True)
     Driver_Name = models.CharField(max_length=100,null=True,blank=True)
     def get_absolute_url(self):
